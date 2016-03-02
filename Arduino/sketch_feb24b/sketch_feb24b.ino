@@ -23,7 +23,7 @@ void displaySensorDetails(void)
 
 void setup(void) 
 {
-  Serial.begin(19200);
+  Serial.begin(9600);
   Serial.println("Accelerometer Test"); Serial.println("");
   
   /* Initialise the sensor */
@@ -46,5 +46,5 @@ void loop() {
   Serial.print("x"); Serial.println(event.acceleration.x);
   Serial.print("y"); Serial.println(event.acceleration.y);
   Serial.print("z"); Serial.println(event.acceleration.z);
-  delay(1);
+  delay(1000/60);
 }
