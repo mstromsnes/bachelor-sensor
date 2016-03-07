@@ -1,11 +1,11 @@
-#include <Adafruit_10DOF.h>
+// Print acceleration data and time since startup
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
-#include <Mouse.h>
 
+/* Assign a unique ID to this sensor at the same time */
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
-
 
 void displaySensorDetails(void)
 {
@@ -26,6 +26,7 @@ void displaySensorDetails(void)
 void setup(void) 
 {
   Serial.begin(9600);
+
   Serial.println("Accelerometer Test"); Serial.println("");
   
   /* Initialise the sensor */
@@ -38,38 +39,16 @@ void setup(void)
   
   /* Display some basic information on this sensor */
   displaySensorDetails();
-  Mouse.begin();
 }
 
 void loop() {
-  sensors_event_t accel_event;
-  sensors_vec_t   orientation;
-
-/* Calculate pitch and roll from the raw accelerometer data */
-accel.getEvent(&accel_event);
-accelGetOrientation(&accel_event, &orientation);
-{
-  /* 'orientation' should have valid .roll and .pitch fields */
-  Serial.print(F("Roll: "));
-  Serial.print(orientation.roll);
-  Serial.print(F("; "));
-  Serial.print(F("Pitch: "));
-  Serial.print(orientation.pitch);
-  Serial.print(F("; "));
+  // put your main code here, to run repeatedly:
+  /* Get a new sensor event */ 
+  sensors_event_t event; 
+  accel.getEvent(&event);
+  Serial.print("x"); Serial.println(event.acceleration.x);
+  Serial.print("y"); Serial.println(event.acceleration.y);
+  Serial.print("z"); Serial.println(event.acceleration.z);
+  Serial.print("t"); Serial.println(millis());
+  //delay(35);
 }
-// read and scale the two axes:
-//
-//  int xReading0 = event.acceleration.x;
-//  int yReading0 = event.acceleration.z;
-//  delay(1);
-//  accel.getEvent(&event);
-//  int xReading1 = event.acceleration.x;
-//  int yReading1 = event.acceleration.z;
-//
-//// move the mouse:
-//    Mouse.move((xReading1-xReading0), -(yReading1-yReading0), 0);
-//    delay(1);
-//  
-}
-
-

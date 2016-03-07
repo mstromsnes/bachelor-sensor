@@ -1,3 +1,5 @@
+// Print the magnitude of the acceleration vector for use with serial plotter
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303_U.h>
@@ -23,7 +25,7 @@ void displaySensorDetails(void)
 
 void setup(void) 
 {
-  Serial.begin(19200);
+  Serial.begin(38400);
   Serial.println("Accelerometer Test"); Serial.println("");
   
   /* Initialise the sensor */
@@ -35,7 +37,7 @@ void setup(void)
   }
   
   /* Display some basic information on this sensor */
-  displaySensorDetails();
+ // displaySensorDetails();
 }
 
 void loop() {
@@ -43,8 +45,9 @@ void loop() {
   /* Get a new sensor event */ 
   sensors_event_t event; 
   accel.getEvent(&event);
-  Serial.print("x"); Serial.println(event.acceleration.x);
-  Serial.print("y"); Serial.println(event.acceleration.y);
-  Serial.print("z"); Serial.println(event.acceleration.z);
-  delay(1);
+//  Serial.print("x"); Serial.println(event.acceleration.x);
+  //Serial.print("y"); Serial.println(event.acceleration.y);
+  //Serial.print("z"); 
+  //Serial.println(event.acceleration.z);
+  Serial.println(sqrt(event.acceleration.x*event.acceleration.x+event.acceleration.y*event.acceleration.y+event.acceleration.z*event.acceleration.z));
 }
