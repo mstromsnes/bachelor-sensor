@@ -4,10 +4,11 @@ import java.util.Date;
 
 Serial myPort;
 float x, y, z;      // Stores the acceldata
-long t, rt = 0;     // Stores time-information to deal with delay    
+long t, rt, currentDelay, previousDelay = 0;     // Stores time-information to deal with delay
+int j = 0;
 float max_x = 0;    //
 float xy_plane;     // Magnitude of the xy-vector
-int fr = 60;        // Initial framerate
+int fr = 15;        // Initial framerate
 
 
 void setup() {
@@ -55,9 +56,12 @@ void draw() {
       line(0,0,-10*x,10*y);                                 //
       noFill();                                             // Draws the vector and magnitude-circle
       ellipse(0,0,2*10*xy_plane,2*10*xy_plane);             //
-      print("Time delay: "); print((time.getTime()-t-rt));  // Writes time-delay to console. Real-time is not 0
+      j++;
+      if(j == 30){previousDelay=currentDelay;}
+      currentDelay = time.getTime()-t-rt;
+      print("Time delay: "); print(currentDelay);  // Writes time-delay to console. Real-time is not 0
       println("ms");
-      if ( time.getTime()-t-rt > 100 ) {frameRate(++fr);}   // Checks if delay is too big and increases framerate to adjust. Should probably be corrected to check if delay is increasing
+      if ( currentDelay-previousDelay > 100 ) {frameRate(++fr);}   // Checks if delay is too big and increases framerate to adjust.
       print("Framerate: "); println(fr);                    // Writes current framerate to console
   }
 }
