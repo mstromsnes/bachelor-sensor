@@ -27,13 +27,15 @@ const uint16_t tapThreshold = 140;
 const uint8_t  sampleThreshold = 6;
 const uint16_t peaceThreshold = 50;
 const uint8_t peaceTimer = 5;
-const uint8_t turbulenceThreshold = 10;
+const uint8_t turbulenceThreshold = 16;
 uint8_t peaceCounter = 0;
 uint8_t tapCounter = 0;
 bool tapFound = false;
 bool peaceFollowed = false;
 uint8_t tapTime = 0;
-uint8_t turbulence = 0;
+uint8_t turbulence[50];
+uint8_t turbulenceCounter = 0;
+uint8_t sumOfTurbulence = 0;
 
 bool LED_ON = false;
 // ================================================================
@@ -102,6 +104,8 @@ void setup() {
     }
      // configure LED for output
     pinMode(LED_PIN, OUTPUT);
+
+    memset(turbulence,0,sizeof(turbulence));
 }
 
 void loop() {
@@ -110,7 +114,7 @@ void loop() {
   if(!dmpReady) return;
 
   // wait for MPU interrupt or extra packet(s) available
-    while (!mpuInterrupt && fifoCount < packetSize) {
+    while (!mpuInterrupt) {
       
     }
     
@@ -152,10 +156,12 @@ void loop() {
                if (abs(aaReal.z) > peaceThreshold){
                   peaceCounter = 0;
                   peaceFollowed = false;
+                  sumOfTurbulence = sumOfTurbulence - turbulence[turbulenceCounter];
+                  turbulence[turbulenceCounter++] = 1;
+                  sumOfTurbulence = sumOfTurbulence + 1;
                   if(abs(aaReal.z) > tapThreshold){
                   tapCounter++;
                   tapFound = false;
-                  turbulence = 0;
                   }
                }
                if (abs(aaReal.z) < tapThreshold){
@@ -164,11 +170,16 @@ void loop() {
                      }
                     tapCounter = 0;
                   }
-                if (abs(aaReal.z)>peaceThreshold && abs(aaReal.z) < tapThreshold)turbulence++;
+                if (abs(aaReal.z)<peaceThreshold){
+                  sumOfTurbulence = sumOfTurbulence - turbulence[turbulenceCounter];
+                  turbulence[turbulenceCounter++] = 0;
+                }
+                if(turbulenceCounter == 50) turbulenceCounter = 0;
+                
 
                if(tapFound){
                   if(abs(aaReal.z) < peaceThreshold) peaceCounter++;
-                  if(peaceCounter == peaceTimer && turbulence < turbulenceThreshold){ 
+                  if(peaceCounter == peaceTimer && sumOfTurbulence < turbulenceThreshold){ 
                       peaceFollowed = true;
                       digitalWrite(LED_PIN,tapFound);
                       Serial.print("Haha");
@@ -176,7 +187,6 @@ void loop() {
                       tapTime = 0;
                       peaceCounter = 0;
                       tapFound = false;
-                      turbulence = 0;
                   }
                }
                if(tapCounter>sampleThreshold)tapCounter = 0;
@@ -189,10 +199,10 @@ void loop() {
               digitalWrite(LED_PIN,tapFound);
               LED_ON = false;
               tapTime = 0;
-              turbulence = 0;
               Serial.print("Hihi");
             }
             if(peaceFollowed) tapTime++;
+            
             // Serial.print("areal\t");
             Serial.print(aaReal.x);
             Serial.print("\t");
@@ -206,7 +216,7 @@ void loop() {
             Serial.print("\t");
             Serial.print(peaceCounter);
             Serial.print("\t");
-            Serial.print(turbulence);
+            Serial.print(sumOfTurbulence);
             Serial.print("\t");
             Serial.print(1000000/dt); Serial.print("\n"); //Prints the sampling frequency
             
