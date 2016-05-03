@@ -67,7 +67,7 @@ int gx, gy, gz;         // gyrometer values
 
 int calibrateOffsets = 1; // int to determine whether calibration takes place or not
 
-long lastFlushTime, timeSinceBoot = millis();
+long lastFlushTime, timeSinceBoot, ledTimer = millis();
 
 void setup() {
   Serial.begin(115200); // initialize Serial communication
@@ -220,12 +220,19 @@ void loop() {
   Serial.println(logstring);
   logfile.println(logstring);
   }
-  if (timeSinceBoot > lastFlushTime+5000){
-    digitalWrite(breadLED,HIGH);
+  if (timeSinceBoot > lastFlushTime+1000){
     logfile.flush();
     lastFlushTime = millis();
   }
-  if(timeSinceBoot > lastFlushTime+500) digitalWrite(breadLED,LOW);
+  if (timeSinceBoot > ledTimer + 5000){
+    digitalWrite(breadLED,HIGH);
+    logfile.println("# " + String(millis()) + " LED ON");
+    ledTimer = millis();
+  }
+  if((timeSinceBoot > ledTimer+600) & digitalRead(breadLED)){
+    digitalWrite(breadLED,LOW);
+    logfile.println("# " + String(millis()) + " LED OFF");
+  }
 
 
 }
