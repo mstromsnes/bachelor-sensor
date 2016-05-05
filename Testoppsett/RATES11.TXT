@@ -1,0 +1,7 @@
+Accelerometer Sampling Rate:	100.00
+Accelerometer Range (G):	2
+Gyroscope Sampling Rate:	100
+Gyroscope Range (degrees pr second):	250
+Format in logfile:
+millis_since_boot,ax,ay,az,gx,gy,gz
+All units are LSB
